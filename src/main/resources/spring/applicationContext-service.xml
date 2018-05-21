@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:context="http://www.springframework.org/schema/context" xmlns:p="http://www.springframework.org/schema/p"
+	xmlns:aop="http://www.springframework.org/schema/aop" xmlns:tx="http://www.springframework.org/schema/tx"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-4.0.xsd
+	http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context-4.0.xsd
+	http://www.springframework.org/schema/aop http://www.springframework.org/schema/aop/spring-aop-4.0.xsd http://www.springframework.org/schema/tx http://www.springframework.org/schema/tx/spring-tx-4.0.xsd
+	http://www.springframework.org/schema/util http://www.springframework.org/schema/util/spring-util-4.0.xsd">
+
+	<!-- 
+		包扫描器，扫描带@Service注解的类 
+		注意扫描的路径, 去service模块的src/main/java目录下,新建这个包:"com.cj.service".
+		注意,与进销存系统不同的是,这里的各层都拆开了,分为各个工程,
+		所以,这里不用排除扫描@Controller注解了,因为service模块里根本没这个注解.
+		下面这行,是杜云龙的,有一个缺陷: 如果其他同事不用"service"作为service层的包名,那么这样就不行了.
+		如果有需要,再去BB项目里找李旭的方式.
+	-->
+	<context:component-scan base-package="com.cj.core.service"></context:component-scan>
+	
+	<!--
+		单机版的Solr客户端.
+		
+		id:自己起
+		class:SolrServer的实现类.(专用于连接单机版的)
+		constructor-arg: 这个是HttpSolrServer的构造方法.
+		name:构函的参数.是个URL.可以看自己的关于Solrj的测试类.
+		value:是连接Solr服务的url地址.
+		
+	 -->
+	<bean id="httpSolrServer" class="org.apache.solr.client.solrj.impl.HttpSolrServer">
+		<constructor-arg name="baseURL" value="http://39.105.62.153:8080/solr"/>
+	</bean>
+
+</beans>
