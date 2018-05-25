@@ -16,8 +16,9 @@
 		下面这行,是杜云龙的,有一个缺陷: 如果其他同事不用"service"作为service层的包名,那么这样就不行了.
 		如果有需要,再去BB项目里找李旭的方式.
 	-->
-	<context:component-scan base-package="com.cj.core.service"></context:component-scan>
-	
+	<context:component-scan base-package="com.cj.core.service"/>
+	<context:component-scan base-package="com.cj.core.facade"/>
+
 	<!--
 		单机版的Solr客户端.
 		
@@ -29,7 +30,10 @@
 		
 	 -->
 	<bean id="httpSolrServer" class="org.apache.solr.client.solrj.impl.HttpSolrServer">
-		<constructor-arg name="baseURL" value="http://39.105.62.153:8080/solr"/>
+		<constructor-arg name="baseURL" value="${solr.base}"/>
 	</bean>
+
+	<!--引入dubbo生产者的配置文件-->
+	<import resource="classpath:spring/spring-dubbo-provider.xml" />
 
 </beans>

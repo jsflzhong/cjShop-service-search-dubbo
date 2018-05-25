@@ -1,11 +1,14 @@
 package com.cj.core.service.impl;
 
+import com.cj.core.pojo.SearchItem;
 import com.cj.core.pojo.SearchResult;
 import com.cj.core.service.SearchMapper;
 import com.cj.core.service.SearchService;
 import org.apache.solr.client.solrj.SolrQuery;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+
+import java.util.ArrayList;
 
 /**
  * 搜索服务的service
@@ -31,6 +34,22 @@ public class SearchServiceImpl implements SearchService {
      */
     @Override
     public SearchResult search(String queryString, int page, int rows) throws Exception {
+
+        //没装solr的情况下测试用代码.
+        if(1==1) {
+            SearchResult searchResult = new SearchResult();
+            searchResult.setCurPage(page);
+            searchResult.setPageCount(2);
+            searchResult.setRecordCount(22L);
+            ArrayList<SearchItem> list = new ArrayList<>();
+            SearchItem searchItem = new SearchItem();
+            searchItem.setItem_desc("只是测试用的结果!!!~~~");
+            list.add(searchItem);
+            searchResult.setItemList(list);
+            return searchResult;
+        }
+
+
         //创建查询条件
         SolrQuery query = new SolrQuery();  //该对象在上面的dao中出现过.就是Solr的查询条件的实体.
         //设置查询条件

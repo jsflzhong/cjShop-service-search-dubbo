@@ -12,11 +12,59 @@
     <packaging>war</packaging>
 
     <dependencies>
+
+        <!-- common工程引入 -->
         <dependency>
             <groupId>com.cj</groupId>
             <artifactId>cjShop-common</artifactId>
             <version>0.0.1-SNAPSHOT</version>
         </dependency>
+
+        <!-- common-config接口工程引入 -->
+        <dependency>
+            <groupId>com.cj</groupId>
+            <artifactId>cjShop-common-config</artifactId>
+            <version>0.0.1-SNAPSHOT</version>
+        </dependency>
+
+        <!-- common-core接口工程引入 -->
+        <dependency>
+            <groupId>com.cj</groupId>
+            <artifactId>cjShop-common-core</artifactId>
+            <version>0.0.1-SNAPSHOT</version>
+        </dependency>
+
+        <!-- facade-rest接口工程引入 -->
+        <dependency>
+            <groupId>com.cj</groupId>
+            <artifactId>cjShop-facade-search</artifactId>
+            <version>0.0.1-SNAPSHOT</version>
+        </dependency>
+
+        <!-- dubbo required jars start -->
+        <dependency>
+            <groupId>org.jboss.netty</groupId>
+            <artifactId>netty</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>com.alibaba</groupId>
+            <artifactId>dubbo</artifactId>
+            <exclusions>
+                <exclusion>
+                    <groupId>org.springframework</groupId>
+                    <artifactId>spring</artifactId>
+                </exclusion>
+            </exclusions>
+        </dependency>
+        <dependency>
+            <groupId>org.apache.zookeeper</groupId>
+            <artifactId>zookeeper</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>com.101tec</groupId>
+            <artifactId>zkclient</artifactId>
+        </dependency>
+        <!-- dubbo required jars end -->
 
         <!-- //MySql -->
         <dependency>
