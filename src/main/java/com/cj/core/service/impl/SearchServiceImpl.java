@@ -37,6 +37,7 @@ public class SearchServiceImpl implements SearchService {
 
         //没装solr的情况下测试用代码.
         if(1==1) {
+            System.out.println("@@@@@@@@@ 执行测试代码 @@@@@@@@@");
             SearchResult searchResult = new SearchResult();
             searchResult.setCurPage(page);
             searchResult.setPageCount(2);
@@ -46,6 +47,7 @@ public class SearchServiceImpl implements SearchService {
             searchItem.setItem_desc("只是测试用的结果!!!~~~");
             list.add(searchItem);
             searchResult.setItemList(list);
+            System.out.println("@@@@@@@@@ 执行测试代码结束！ @@@@@@@@@");
             return searchResult;
         }
 

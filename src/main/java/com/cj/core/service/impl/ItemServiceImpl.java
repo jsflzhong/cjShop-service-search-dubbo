@@ -10,7 +10,7 @@ import org.springframework.stereotype.Service;
 import com.cj.core.mapper.ItemMapper;
 import com.cj.core.pojo.SearchItem;
 import com.cj.core.service.ItemService;
-import com.cj.common.pojo.TaotaoResult;
+import com.cj.core.pojo.TaotaoResult;
 
 @Service
 public class ItemServiceImpl implements ItemService {
