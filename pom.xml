@@ -9,7 +9,7 @@
     <groupId>com.cj</groupId>
     <artifactId>cjShop-service-search</artifactId>
     <version>0.0.1-SNAPSHOT</version>
-    <packaging>war</packaging>
+    <packaging>jar</packaging>
 
     <dependencies>
 
@@ -142,35 +142,132 @@
     </dependencies>
 
 
-    <!-- //添加tomcat插件.端口该是8083了. -->
     <build>
-        <plugins>
-            <plugin>
-                <groupId>org.apache.tomcat.maven</groupId>
-                <artifactId>tomcat7-maven-plugin</artifactId>
-                <configuration>
-                    <port>8083</port>
-                    <path>/</path>
-                </configuration>
-            </plugin>
-        </plugins>
         <resources>
-            <resource>
+            <!--<resource>
                 <directory>src/main/java</directory>
                 <includes>
                     <include>**/*.properties</include>
                     <include>**/*.xml</include>
                 </includes>
                 <filtering>false</filtering>
-            </resource>
+            </resource>-->
+            <!--2.打jar包时，要把resources包下的所有指定后缀文件都打进jar包
+                注意，如果想要不指定后缀，而要打resources包下的所有文件，
+                则要这样： **/* 即可。 -->
             <resource>
+                <targetPath>${project.build.directory}/classes</targetPath>
                 <directory>src/main/resources</directory>
+                <filtering>true</filtering>
                 <includes>
-                    <include>**/*.properties</include>
                     <include>**/*.xml</include>
+                    <include>**/*.properties</include>
                 </includes>
-                <filtering>false</filtering>
             </resource>
+
+            <!--3.重点：根据dubbo官方文档，当使用dubbo的方式打jar包是，
+             会自动把/META-INF/目录下的配置文件读取出来当作spring的配置文件，
+             但我们实际中的spring的配置文件大多是放在/resources/spring/目录下的，
+             所以，这里要配置，意思是在打jar包时，自动把/resource/spring/目录下的指定配置文件，
+             复制到/META-INF/目录下去。
+             其实是符合了com.alibaba.dubbo.container.Main中的COC原则而已！
+             自己的项目不只是这一个spring配置文件，所以还需要亲测试试该怎么配。
+             按道理应该只配这一个spring文件即可（名字也可能时spring-application.xml） -->
+            <resource>
+                <targetPath>${project.build.directory}/classes/META-INF/spring</targetPath>
+                <directory>src/main/resources/spring</directory>
+                <filtering>true</filtering>
+                <includes>
+                    <!--<include>spring-context.xml</include>-->
+                    <include>applicationContext-service.xml</include>
+                    <include>applicationContext-dao.xml</include>
+                </includes>
+            </resource>
+
         </resources>
+
+        <pluginManagement>
+            <plugins>
+                <!-- 为了解决maven插件在Eclipse内执行了一系列的生命周期引起冲突。-->
+                <plugin>
+                    <groupId>org.eclipse.m2e</groupId>
+                    <artifactId>lifecycle-mapping</artifactId>
+                    <version>1.0.0</version>
+                    <configuration>
+                        <lifecycleMappingMetadata>
+                            <pluginExecutions>
+                                <pluginExecution>
+                                    <pluginExecutionFilter>
+                                        <groupId>org.apache.maven.plugins</groupId>
+                                        <artifactId>maven-dependency-plugin</artifactId>
+                                        <versionRange>[2.0,)</versionRange>
+                                        <goals>
+                                            <goal>copy-dependencies</goal>
+                                        </goals>
+                                    </pluginExecutionFilter>
+                                    <action>
+                                        <ignore/>
+                                    </action>
+                                </pluginExecution>
+                            </pluginExecutions>
+                        </lifecycleMappingMetadata>
+                    </configuration>
+                </plugin>
+            </plugins>
+        </pluginManagement>
+
+        <!-- 下面这两块插件的配置，应该是可以通用的，可以直接复制使用在其他工程中。-->
+        <plugins>
+            <!-- 4.打包jar文件时用的插件： 负责配置manifest文件，加入lib包的jar依赖 -->
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-jar-plugin</artifactId>
+                <configuration>
+                    <!-- 把target/classes下的文件放到jar包里面去。-->
+                    <classesDirectory>target/classes/</classesDirectory>
+                    <archive>
+                        <manifest>
+                            <!-- 配置程序main入口类。指定为dubbo提供的main方法。-->
+                            <mainClass>com.alibaba.dubbo.container.Main</mainClass>
+                            <!-- 解决：打包时 MANIFEST.MF文件不自动记录的，但却应该有的：时间戳版本 -->
+                            <useUniqueVersions>false</useUniqueVersions>
+                            <!-- 本项目打出来的jar包，要依赖下一行的类路径下的jar包 -->
+                            <addClasspath>true</addClasspath>
+                            <!-- 打jar时，要把指定目录lib/下的，这些外部jar包，都打进jar包里去 -->
+                            <!-- 外部jar是怎么进入到/lib/目录下的？ 看下一个插件。-->
+                            <classpathPrefix>lib/</classpathPrefix>
+                        </manifest>
+                        <manifestEntries>
+                            <Class-Path>.</Class-Path>
+                        </manifestEntries>
+                    </archive>
+                </configuration>
+            </plugin>
+
+            <!-- 5.本插件用来解决上述的依赖问题-->
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-dependency-plugin</artifactId>
+                <executions>
+                    <execution>
+                        <id>copy-dependencies</id>
+                        <phase>package</phase>
+                        <goals>
+                            <goal>copy-dependencies</goal>
+                        </goals>
+                        <configuration>
+                            <type>jar</type>
+                            <includeTypes>jar</includeTypes>
+                            <!--本次打包时，要把工程内所依赖的外部jar包，复制进下面指定的：”本工程下的/lib/“ 目录下，】
+                             便于让上面的插件在打jar包时把这些依赖的外部jar包也打进去！-->
+                            <outputDirectory>
+                                ${project.build.directory}/lib
+                            </outputDirectory>
+                        </configuration>
+                    </execution>
+                </executions>
+            </plugin>
+        </plugins>
+
     </build>
 </project>
